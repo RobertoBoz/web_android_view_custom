@@ -20,6 +20,8 @@ import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewClientCompat;
 import android.net.http.SslError;
 import android.webkit.SslErrorHandler;
+import android.net.http.SslError;
+import android.webkit.SslErrorHandler;
 
 /**
  * Host api implementation for {@link WebViewClient}.
@@ -112,6 +114,12 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
         flutterApi.dispose(this, reply -> {});
       }
       flutterApi = null;
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        // Ignora todos los errores SSL
+        handler.proceed();
     }
   }
 

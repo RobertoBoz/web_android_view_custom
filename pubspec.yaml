@@ -14,7 +14,7 @@ flutter:
     platforms:
       android:
         package: io.flutter.plugins.webviewflutter
-        pluginClass: webview_flutter
+        pluginClass: WebViewFlutterPlugin
 
 dependencies:
   flutter:

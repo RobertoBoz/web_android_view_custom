@@ -422,13 +422,13 @@
       "languageVersion": "2.19"
     },
     {
-      "name": "webview_flutter_android",
+      "name": "webview_pro_android",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2024-10-29T00:27:41.808428Z",
+  "generated": "2024-10-29T03:40:59.090115Z",
   "generator": "pub",
   "generatorVersion": "3.3.3"
 }

@@ -4,7 +4,6 @@
 
 package io.flutter.plugins.webviewflutter;
 
-import androidx.annotation.NonNull;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugins.webviewflutter.GeneratedAndroidWebView.JavaScriptChannelFlutterApi;
 
@@ -23,24 +22,29 @@ public class JavaScriptChannelFlutterApiImpl extends JavaScriptChannelFlutterApi
    * @param instanceManager Maintains instances stored to communicate with Dart objects.
    */
   public JavaScriptChannelFlutterApiImpl(
-      @NonNull BinaryMessenger binaryMessenger, @NonNull InstanceManager instanceManager) {
+      BinaryMessenger binaryMessenger, InstanceManager instanceManager) {
     super(binaryMessenger);
     this.instanceManager = instanceManager;
   }
 
   /** Passes arguments from {@link JavaScriptChannel#postMessage} to Dart. */
   public void postMessage(
-      @NonNull JavaScriptChannel javaScriptChannel,
-      @NonNull String messageArg,
-      @NonNull Reply<Void> callback) {
-    super.postMessage(getIdentifierForJavaScriptChannel(javaScriptChannel), messageArg, callback);
+      JavaScriptChannel javaScriptChannel, String messageArg, Reply<Void> callback) {
+    super.postMessage(instanceManager.getInstanceId(javaScriptChannel), messageArg, callback);
   }
 
-  private long getIdentifierForJavaScriptChannel(JavaScriptChannel javaScriptChannel) {
-    final Long identifier = instanceManager.getIdentifierForStrongReference(javaScriptChannel);
-    if (identifier == null) {
-      throw new IllegalStateException("Could not find identifier for JavaScriptChannel.");
+  /**
+   * Communicates to Dart that the reference to a {@link JavaScriptChannel} was removed.
+   *
+   * @param javaScriptChannel The instance whose reference will be removed.
+   * @param callback Reply callback with return value from Dart.
+   */
+  public void dispose(JavaScriptChannel javaScriptChannel, Reply<Void> callback) {
+    final Long instanceId = instanceManager.removeInstance(javaScriptChannel);
+    if (instanceId != null) {
+      dispose(instanceId, callback);
+    } else {
+      callback.reply(null);
     }
-    return identifier;
   }
 }

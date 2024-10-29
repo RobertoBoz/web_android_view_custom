@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.webkit.JavascriptInterface;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Added as a JavaScript interface to the WebView for any JavaScript channel that the Dart code sets
@@ -15,11 +16,13 @@ import androidx.annotation.NonNull;
  *
  * <p>Exposes a single method named `postMessage` to JavaScript, which sends a message to the Dart
  * code.
+ *
+ * <p>No messages are sent to Dart after {@link JavaScriptChannel#release} is called.
  */
-public class JavaScriptChannel {
+public class JavaScriptChannel implements Releasable {
   private final Handler platformThreadHandler;
   final String javaScriptChannelName;
-  private final JavaScriptChannelFlutterApiImpl flutterApi;
+  @Nullable private JavaScriptChannelFlutterApiImpl flutterApi;
 
   /**
    * Creates a {@link JavaScriptChannel} that passes arguments of callback methods to Dart.
@@ -30,8 +33,8 @@ public class JavaScriptChannel {
    */
   public JavaScriptChannel(
       @NonNull JavaScriptChannelFlutterApiImpl flutterApi,
-      @NonNull String channelName,
-      @NonNull Handler platformThreadHandler) {
+      String channelName,
+      Handler platformThreadHandler) {
     this.flutterApi = flutterApi;
     this.javaScriptChannelName = channelName;
     this.platformThreadHandler = platformThreadHandler;
@@ -40,14 +43,26 @@ public class JavaScriptChannel {
   // Suppressing unused warning as this is invoked from JavaScript.
   @SuppressWarnings("unused")
   @JavascriptInterface
-  public void postMessage(@NonNull final String message) {
+  public void postMessage(final String message) {
     final Runnable postMessageRunnable =
-        () -> flutterApi.postMessage(JavaScriptChannel.this, message, reply -> {});
+        () -> {
+          if (flutterApi != null) {
+            flutterApi.postMessage(JavaScriptChannel.this, message, reply -> {});
+          }
+        };
 
     if (platformThreadHandler.getLooper() == Looper.myLooper()) {
       postMessageRunnable.run();
     } else {
       platformThreadHandler.post(postMessageRunnable);
     }
+  }
+
+  @Override
+  public void release() {
+    if (flutterApi != null) {
+      flutterApi.dispose(this, reply -> {});
+    }
+    flutterApi = null;
   }
 }

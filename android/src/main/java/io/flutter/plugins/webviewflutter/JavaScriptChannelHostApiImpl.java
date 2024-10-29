@@ -5,7 +5,6 @@
 package io.flutter.plugins.webviewflutter;
 
 import android.os.Handler;
-import androidx.annotation.NonNull;
 import io.flutter.plugins.webviewflutter.GeneratedAndroidWebView.JavaScriptChannelHostApi;
 
 /**
@@ -30,11 +29,10 @@ public class JavaScriptChannelHostApiImpl implements JavaScriptChannelHostApi {
      * @param platformThreadHandler handles making callbacks on the desired thread
      * @return the created {@link JavaScriptChannel}
      */
-    @NonNull
     public JavaScriptChannel createJavaScriptChannel(
-        @NonNull JavaScriptChannelFlutterApiImpl flutterApi,
-        @NonNull String channelName,
-        @NonNull Handler platformThreadHandler) {
+        JavaScriptChannelFlutterApiImpl flutterApi,
+        String channelName,
+        Handler platformThreadHandler) {
       return new JavaScriptChannel(flutterApi, channelName, platformThreadHandler);
     }
   }
@@ -48,10 +46,10 @@ public class JavaScriptChannelHostApiImpl implements JavaScriptChannelHostApi {
    * @param platformThreadHandler handles making callbacks on the desired thread
    */
   public JavaScriptChannelHostApiImpl(
-      @NonNull InstanceManager instanceManager,
-      @NonNull JavaScriptChannelCreator javaScriptChannelCreator,
-      @NonNull JavaScriptChannelFlutterApiImpl flutterApi,
-      @NonNull Handler platformThreadHandler) {
+      InstanceManager instanceManager,
+      JavaScriptChannelCreator javaScriptChannelCreator,
+      JavaScriptChannelFlutterApiImpl flutterApi,
+      Handler platformThreadHandler) {
     this.instanceManager = instanceManager;
     this.javaScriptChannelCreator = javaScriptChannelCreator;
     this.flutterApi = flutterApi;
@@ -63,15 +61,15 @@ public class JavaScriptChannelHostApiImpl implements JavaScriptChannelHostApi {
    *
    * @param platformThreadHandler the new thread handler
    */
-  public void setPlatformThreadHandler(@NonNull Handler platformThreadHandler) {
+  public void setPlatformThreadHandler(Handler platformThreadHandler) {
     this.platformThreadHandler = platformThreadHandler;
   }
 
   @Override
-  public void create(@NonNull Long instanceId, @NonNull String channelName) {
+  public void create(Long instanceId, String channelName) {
     final JavaScriptChannel javaScriptChannel =
         javaScriptChannelCreator.createJavaScriptChannel(
             flutterApi, channelName, platformThreadHandler);
-    instanceManager.addDartCreatedInstance(javaScriptChannel, instanceId);
+    instanceManager.addInstance(javaScriptChannel, instanceId);
   }
 }

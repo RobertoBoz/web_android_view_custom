@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: ae92f5d747aee634b87f89d9946000c2de774be1d6ac3e58268224348cd0101a
+      sha256: "0b2f2bd91ba804e53a61d757b986f89f1f9eaed5b11e4b2f5a2468d86d6c9fc7"
       url: "https://pub.dev"
     source: hosted
-    version: "61.0.0"
+    version: "67.0.0"
   analyzer:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: analyzer
-      sha256: ea3d8652bda62982addfd92fdc2d0214e5f82e43325104990d4f4c4a2a313562
+      sha256: "37577842a27e4338429a1cbc32679d508836510b056f1eedf0c8d20e39c1383d"
       url: "https://pub.dev"
     source: hosted
-    version: "5.13.0"
+    version: "6.4.1"
   args:
     dependency: transitive
     description:
@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "1efa911ca7086affd35f463ca2fc1799584fb6aa89883cf0af8e3664d6a02d55"
+      sha256: "7856d364b589d1f08986e140938578ed36ed948581fbc3bc9aef1805039ac5ab"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.7"
   fake_async:
     dependency: transitive
     description:
@@ -198,6 +198,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_driver:
+    dependency: "direct dev"
+    description:
+      name: flutter_driver
+      sha256: "32f042f2d6b5805986dcd6edff228884160f9a98d4ec586361d6ae9f58ab0684"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -355,14 +363,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+  pedantic:
+    dependency: "direct dev"
+    description:
+      name: pedantic
+      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.11.1"
   pigeon:
     dependency: "direct dev"
     description:
       name: pigeon
-      sha256: "5a79fd0b10423f6b5705525e32015597f861c31220b522a67d1e6b580da96719"
+      sha256: "575d2cb718572be233700f45cb97d41f5e9e612e2031cd45ca6e3ad6f2b0d98d"
       url: "https://pub.dev"
     source: hosted
-    version: "11.0.1"
+    version: "1.0.9"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -536,14 +552,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.5"
-  webview_flutter_platform_interface:
+  webview_pro_platform_interface:
     dependency: "direct main"
     description:
-      name: webview_flutter_platform_interface
-      sha256: d937581d6e558908d7ae3dc1989c4f87b786891ab47bb9df7de548a151779d8d
+      name: webview_pro_platform_interface
+      sha256: "8f199fcadf403a10bbe536431f811b45068c21c5c0d4553911afd32d443c559b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.10.0"
+    version: "1.8.1+2"
   yaml:
     dependency: transitive
     description:
@@ -554,4 +570,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.3.0 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=2.5.0"

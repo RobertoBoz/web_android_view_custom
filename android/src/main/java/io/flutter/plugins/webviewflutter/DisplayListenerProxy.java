@@ -6,6 +6,7 @@ package io.flutter.plugins.webviewflutter;
 
 import static android.hardware.display.DisplayManager.DisplayListener;
 
+import android.annotation.TargetApi;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.util.Log;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
  * first initialization of a webview within the process the difference between the lists is the
  * webview's display listener.
  */
+@TargetApi(Build.VERSION_CODES.KITKAT)
 class DisplayListenerProxy {
   private static final String TAG = "DisplayListenerProxy";
 

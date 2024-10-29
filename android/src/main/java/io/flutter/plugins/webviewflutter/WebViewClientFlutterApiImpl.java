@@ -6,20 +6,14 @@ package io.flutter.plugins.webviewflutter;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.webkit.HttpAuthHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebResourceErrorCompat;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugins.webviewflutter.GeneratedAndroidWebView.WebViewClientFlutterApi;
-import java.util.HashMap;
-import java.util.Objects;
-
 
 /**
  * Flutter Api implementation for {@link WebViewClient}.
@@ -27,57 +21,45 @@ import java.util.Objects;
  * <p>Passes arguments of callbacks methods from a {@link WebViewClient} to Dart.
  */
 public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
-  // To ease adding additional methods, this value is added prematurely.
-  @SuppressWarnings({"unused", "FieldCanBeLocal"})
-  private final BinaryMessenger binaryMessenger;
-
   private final InstanceManager instanceManager;
-  private final WebViewFlutterApiImpl webViewFlutterApi;
 
   @RequiresApi(api = Build.VERSION_CODES.M)
   static GeneratedAndroidWebView.WebResourceErrorData createWebResourceErrorData(
       WebResourceError error) {
-    return new GeneratedAndroidWebView.WebResourceErrorData.Builder()
-        .setErrorCode((long) error.getErrorCode())
-        .setDescription(error.getDescription().toString())
-        .build();
+    final GeneratedAndroidWebView.WebResourceErrorData errorData =
+        new GeneratedAndroidWebView.WebResourceErrorData();
+    errorData.setErrorCode((long) error.getErrorCode());
+    errorData.setDescription(error.getDescription().toString());
+
+    return errorData;
   }
 
   @SuppressLint("RequiresFeature")
   static GeneratedAndroidWebView.WebResourceErrorData createWebResourceErrorData(
       WebResourceErrorCompat error) {
-    return new GeneratedAndroidWebView.WebResourceErrorData.Builder()
-        .setErrorCode((long) error.getErrorCode())
-        .setDescription(error.getDescription().toString())
-        .build();
+    final GeneratedAndroidWebView.WebResourceErrorData errorData =
+        new GeneratedAndroidWebView.WebResourceErrorData();
+    errorData.setErrorCode((long) error.getErrorCode());
+    errorData.setDescription(error.getDescription().toString());
+
+    return errorData;
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   static GeneratedAndroidWebView.WebResourceRequestData createWebResourceRequestData(
       WebResourceRequest request) {
-    final GeneratedAndroidWebView.WebResourceRequestData.Builder requestData =
-        new GeneratedAndroidWebView.WebResourceRequestData.Builder()
-            .setUrl(request.getUrl().toString())
-            .setIsForMainFrame(request.isForMainFrame())
-            .setHasGesture(request.hasGesture())
-            .setMethod(request.getMethod())
-            .setRequestHeaders(
-                request.getRequestHeaders() != null
-                    ? request.getRequestHeaders()
-                    : new HashMap<>());
+    final GeneratedAndroidWebView.WebResourceRequestData requestData =
+        new GeneratedAndroidWebView.WebResourceRequestData();
+    requestData.setUrl(request.getUrl().toString());
+    requestData.setIsForMainFrame(request.isForMainFrame());
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       requestData.setIsRedirect(request.isRedirect());
     }
+    requestData.setHasGesture(request.hasGesture());
+    requestData.setMethod(request.getMethod());
+    requestData.setRequestHeaders(request.getRequestHeaders());
 
-    return requestData.build();
-  }
-
-  static GeneratedAndroidWebView.WebResourceResponseData createWebResourceResponseData(
-      WebResourceResponse response) {
-    final GeneratedAndroidWebView.WebResourceResponseData.Builder responseData =
-        new GeneratedAndroidWebView.WebResourceResponseData.Builder()
-            .setStatusCode((long) response.getStatusCode());
-
-    return responseData.build();
+    return requestData;
   }
 
   /**
@@ -87,54 +69,28 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    * @param instanceManager maintains instances stored to communicate with Dart objects
    */
   public WebViewClientFlutterApiImpl(
-      @NonNull BinaryMessenger binaryMessenger, @NonNull InstanceManager instanceManager) {
+      BinaryMessenger binaryMessenger, InstanceManager instanceManager) {
     super(binaryMessenger);
-    this.binaryMessenger = binaryMessenger;
     this.instanceManager = instanceManager;
-    webViewFlutterApi = new WebViewFlutterApiImpl(binaryMessenger, instanceManager);
   }
 
   /** Passes arguments from {@link WebViewClient#onPageStarted} to Dart. */
   public void onPageStarted(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull String urlArg,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
-    onPageStarted(getIdentifierForClient(webViewClient), webViewIdentifier, urlArg, callback);
+      WebViewClient webViewClient, WebView webView, String urlArg, Reply<Void> callback) {
+    onPageStarted(
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
+        urlArg,
+        callback);
   }
 
   /** Passes arguments from {@link WebViewClient#onPageFinished} to Dart. */
   public void onPageFinished(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull String urlArg,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
-    onPageFinished(getIdentifierForClient(webViewClient), webViewIdentifier, urlArg, callback);
-  }
-
-  /** Passes arguments from {@link WebViewClient#onReceivedHttpError} to Dart. */
-  public void onReceivedHttpError(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull WebResourceRequest request,
-      @NonNull WebResourceResponse response,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier = instanceManager.getIdentifierForStrongReference(webView);
-    onReceivedHttpError(
-        getIdentifierForClient(webViewClient),
-        webViewIdentifier,
-        createWebResourceRequestData(request),
-        createWebResourceResponseData(response),
+      WebViewClient webViewClient, WebView webView, String urlArg, Reply<Void> callback) {
+    onPageFinished(
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
+        urlArg,
         callback);
   }
 
@@ -144,18 +100,14 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    */
   @RequiresApi(api = Build.VERSION_CODES.M)
   public void onReceivedRequestError(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull WebResourceRequest request,
-      @NonNull WebResourceError error,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
+      WebViewClient webViewClient,
+      WebView webView,
+      WebResourceRequest request,
+      WebResourceError error,
+      Reply<Void> callback) {
     onReceivedRequestError(
-        getIdentifierForClient(webViewClient),
-        webViewIdentifier,
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
         createWebResourceRequestData(request),
         createWebResourceErrorData(error),
         callback);
@@ -165,19 +117,16 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    * Passes arguments from {@link androidx.webkit.WebViewClientCompat#onReceivedError(WebView,
    * WebResourceRequest, WebResourceError)} to Dart.
    */
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void onReceivedRequestError(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull WebResourceRequest request,
-      @NonNull WebResourceErrorCompat error,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
+      WebViewClient webViewClient,
+      WebView webView,
+      WebResourceRequest request,
+      WebResourceErrorCompat error,
+      Reply<Void> callback) {
     onReceivedRequestError(
-        getIdentifierForClient(webViewClient),
-        webViewIdentifier,
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
         createWebResourceRequestData(request),
         createWebResourceErrorData(error),
         callback);
@@ -188,19 +137,15 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    * Dart.
    */
   public void onReceivedError(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull Long errorCodeArg,
-      @NonNull String descriptionArg,
-      @NonNull String failingUrlArg,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
+      WebViewClient webViewClient,
+      WebView webView,
+      Long errorCodeArg,
+      String descriptionArg,
+      String failingUrlArg,
+      Reply<Void> callback) {
     onReceivedError(
-        getIdentifierForClient(webViewClient),
-        webViewIdentifier,
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
         errorCodeArg,
         descriptionArg,
         failingUrlArg,
@@ -211,18 +156,15 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    * Passes arguments from {@link WebViewClient#shouldOverrideUrlLoading(WebView,
    * WebResourceRequest)} to Dart.
    */
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void requestLoading(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull WebResourceRequest request,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
+      WebViewClient webViewClient,
+      WebView webView,
+      WebResourceRequest request,
+      Reply<Void> callback) {
     requestLoading(
-        getIdentifierForClient(webViewClient),
-        webViewIdentifier,
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
         createWebResourceRequestData(request),
         callback);
   }
@@ -231,58 +173,26 @@ public class WebViewClientFlutterApiImpl extends WebViewClientFlutterApi {
    * Passes arguments from {@link WebViewClient#shouldOverrideUrlLoading(WebView, String)} to Dart.
    */
   public void urlLoading(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull String urlArg,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
-    urlLoading(getIdentifierForClient(webViewClient), webViewIdentifier, urlArg, callback);
-  }
-
-  /** Passes arguments from {@link WebViewClient#doUpdateVisitedHistory} to Dart. */
-  public void doUpdateVisitedHistory(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webView,
-      @NonNull String url,
-      boolean isReload,
-      @NonNull Reply<Void> callback) {
-    webViewFlutterApi.create(webView, reply -> {});
-
-    final Long webViewIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webView));
-    doUpdateVisitedHistory(
-        getIdentifierForClient(webViewClient), webViewIdentifier, url, isReload, callback);
-  }
-
-  /** Passes arguments from {@link WebViewClient#onReceivedHttpAuthRequest} to Dart. */
-  public void onReceivedHttpAuthRequest(
-      @NonNull WebViewClient webViewClient,
-      @NonNull WebView webview,
-      @NonNull HttpAuthHandler httpAuthHandler,
-      @NonNull String host,
-      @NonNull String realm,
-      @NonNull Reply<Void> callback) {
-    new HttpAuthHandlerFlutterApiImpl(binaryMessenger, instanceManager)
-        .create(httpAuthHandler, reply -> {});
-
-    onReceivedHttpAuthRequest(
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webViewClient)),
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(webview)),
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(httpAuthHandler)),
-        host,
-        realm,
+      WebViewClient webViewClient, WebView webView, String urlArg, Reply<Void> callback) {
+    urlLoading(
+        instanceManager.getInstanceId(webViewClient),
+        instanceManager.getInstanceId(webView),
+        urlArg,
         callback);
   }
- 
 
-  private long getIdentifierForClient(WebViewClient webViewClient) {
-    final Long identifier = instanceManager.getIdentifierForStrongReference(webViewClient);
-    if (identifier == null) {
-      throw new IllegalStateException("Could not find identifier for WebViewClient.");
+  /**
+   * Communicates to Dart that the reference to a {@link WebViewClient} was removed.
+   *
+   * @param webViewClient the instance whose reference will be removed
+   * @param callback reply callback with return value from Dart
+   */
+  public void dispose(WebViewClient webViewClient, Reply<Void> callback) {
+    final Long instanceId = instanceManager.removeInstance(webViewClient);
+    if (instanceId != null) {
+      dispose(instanceId, callback);
+    } else {
+      callback.reply(null);
     }
-    return identifier;
   }
 }

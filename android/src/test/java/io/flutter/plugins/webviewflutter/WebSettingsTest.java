@@ -4,16 +4,12 @@
 
 package io.flutter.plugins.webviewflutter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 import io.flutter.plugins.webviewflutter.WebSettingsHostApiImpl.WebSettingsCreator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,18 +29,10 @@ public class WebSettingsTest {
 
   @Before
   public void setUp() {
-    testInstanceManager = InstanceManager.create(identifier -> {});
-
+    testInstanceManager = new InstanceManager();
     when(mockWebSettingsCreator.createWebSettings(any())).thenReturn(mockWebSettings);
     testHostApiImpl = new WebSettingsHostApiImpl(testInstanceManager, mockWebSettingsCreator);
-
-    testInstanceManager.addDartCreatedInstance(mock(WebView.class), 1);
-    testHostApiImpl.create(0L, 1L);
-  }
-
-  @After
-  public void tearDown() {
-    testInstanceManager.stopFinalizationListener();
+    testHostApiImpl.create(0L, 0L);
   }
 
   @Test
@@ -111,18 +99,5 @@ public class WebSettingsTest {
   public void setBuiltInZoomControls() {
     testHostApiImpl.setBuiltInZoomControls(0L, true);
     verify(mockWebSettings).setBuiltInZoomControls(true);
-  }
-
-  @Test
-  public void setTextZoom() {
-    testHostApiImpl.setTextZoom(0L, 100L);
-    verify(mockWebSettings).setTextZoom(100);
-  }
-
-  @Test
-  public void getUserAgentString() {
-    final String userAgent = "str";
-    when(mockWebSettings.getUserAgentString()).thenReturn(userAgent);
-    assertEquals(testHostApiImpl.getUserAgentString(0L), userAgent);
   }
 }

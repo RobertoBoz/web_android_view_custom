@@ -3,15 +3,15 @@
   "packages": [
     {
       "name": "_fe_analyzer_shared",
-      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-61.0.0",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-67.0.0",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.0"
     },
     {
       "name": "analyzer",
-      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/analyzer-5.13.0",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/analyzer-6.4.1",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "args",
@@ -123,9 +123,9 @@
     },
     {
       "name": "dart_style",
-      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/dart_style-2.3.2",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/dart_style-2.3.7",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.0"
     },
     {
       "name": "fake_async",
@@ -150,6 +150,12 @@
       "rootUri": "file:///Users/mac/development/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "flutter_driver",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/flutter_driver-0.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.7"
     },
     {
       "name": "flutter_test",
@@ -272,10 +278,16 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "pigeon",
-      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/pigeon-11.0.1",
+      "name": "pedantic",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/pedantic-1.11.1",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "pigeon",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/pigeon-1.0.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "plugin_platform_interface",
@@ -410,10 +422,10 @@
       "languageVersion": "3.3"
     },
     {
-      "name": "webview_flutter_platform_interface",
-      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/webview_flutter_platform_interface-2.10.0",
+      "name": "webview_pro_platform_interface",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/webview_pro_platform_interface-1.8.1+2",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "2.12"
     },
     {
       "name": "yaml",
@@ -422,13 +434,13 @@
       "languageVersion": "2.19"
     },
     {
-      "name": "webview_flutter_android",
+      "name": "webview_pro_android",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.14"
     }
   ],
-  "generated": "2024-10-29T04:00:38.662958Z",
+  "generated": "2024-10-29T04:03:45.133885Z",
   "generator": "pub",
   "generatorVersion": "3.3.3"
 }

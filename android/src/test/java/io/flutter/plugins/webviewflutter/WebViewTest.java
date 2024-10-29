@@ -5,30 +5,22 @@
 package io.flutter.plugins.webviewflutter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.os.Build;
-import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
-import androidx.annotation.NonNull;
-import io.flutter.embedding.android.FlutterView;
-import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugins.webviewflutter.GeneratedAndroidWebView.WebViewFlutterApi;
+import io.flutter.plugins.webviewflutter.DownloadListenerHostApiImpl.DownloadListenerImpl;
+import io.flutter.plugins.webviewflutter.WebChromeClientHostApiImpl.WebChromeClientImpl;
+import io.flutter.plugins.webviewflutter.WebViewClientHostApiImpl.WebViewClientImpl;
+import io.flutter.plugins.webviewflutter.WebViewHostApiImpl.InputAwareWebViewPlatformView;
 import io.flutter.plugins.webviewflutter.WebViewHostApiImpl.WebViewPlatformView;
 import java.util.HashMap;
-import java.util.Objects;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,26 +38,122 @@ public class WebViewTest {
 
   @Mock Context mockContext;
 
-  @Mock BinaryMessenger mockBinaryMessenger;
-
   InstanceManager testInstanceManager;
   WebViewHostApiImpl testHostApiImpl;
 
   @Before
   public void setUp() {
-    testInstanceManager = InstanceManager.create(identifier -> {});
-
-    when(mockWebViewProxy.createWebView(mockContext, mockBinaryMessenger, testInstanceManager))
-        .thenReturn(mockWebView);
+    testInstanceManager = new InstanceManager();
+    when(mockWebViewProxy.createWebView(mockContext)).thenReturn(mockWebView);
     testHostApiImpl =
-        new WebViewHostApiImpl(
-            testInstanceManager, mockBinaryMessenger, mockWebViewProxy, mockContext);
-    testHostApiImpl.create(0L);
+        new WebViewHostApiImpl(testInstanceManager, mockWebViewProxy, mockContext, null);
+    testHostApiImpl.create(0L, true);
   }
 
-  @After
-  public void tearDown() {
-    testInstanceManager.stopFinalizationListener();
+  @Test
+  public void releaseWebView() {
+    final WebViewPlatformView webView = new WebViewPlatformView(mockContext);
+
+    final WebViewClientImpl mockWebViewClient = mock(WebViewClientImpl.class);
+    final WebChromeClientImpl mockWebChromeClient = mock(WebChromeClientImpl.class);
+    final DownloadListenerImpl mockDownloadListener = mock(DownloadListenerImpl.class);
+    final JavaScriptChannel mockJavaScriptChannel = mock(JavaScriptChannel.class);
+
+    webView.setWebViewClient(mockWebViewClient);
+    webView.setWebChromeClient(mockWebChromeClient);
+    webView.setDownloadListener(mockDownloadListener);
+    webView.addJavascriptInterface(mockJavaScriptChannel, "jchannel");
+
+    webView.release();
+
+    verify(mockWebViewClient).release();
+    verify(mockWebChromeClient).release();
+    verify(mockDownloadListener).release();
+    verify(mockJavaScriptChannel).release();
+  }
+
+  @Test
+  public void releaseWebViewDependents() {
+    final WebViewPlatformView webView = new WebViewPlatformView(mockContext);
+
+    final WebViewClientImpl mockWebViewClient = mock(WebViewClientImpl.class);
+    final WebChromeClientImpl mockWebChromeClient = mock(WebChromeClientImpl.class);
+    final DownloadListenerImpl mockDownloadListener = mock(DownloadListenerImpl.class);
+    final JavaScriptChannel mockJavaScriptChannel = mock(JavaScriptChannel.class);
+    final JavaScriptChannel mockJavaScriptChannel2 = mock(JavaScriptChannel.class);
+
+    webView.setWebViewClient(mockWebViewClient);
+    webView.setWebChromeClient(mockWebChromeClient);
+    webView.setDownloadListener(mockDownloadListener);
+    webView.addJavascriptInterface(mockJavaScriptChannel, "jchannel");
+
+    // Release should be called on the object added above.
+    webView.addJavascriptInterface(mockJavaScriptChannel2, "jchannel");
+    verify(mockJavaScriptChannel).release();
+
+    webView.setWebViewClient(null);
+    webView.setWebChromeClient(null);
+    webView.setDownloadListener(null);
+    webView.removeJavascriptInterface("jchannel");
+
+    verify(mockWebViewClient).release();
+    verify(mockWebChromeClient).release();
+    verify(mockDownloadListener).release();
+    verify(mockJavaScriptChannel2).release();
+  }
+
+  @Test
+  public void releaseInputAwareWebView() {
+    final InputAwareWebViewPlatformView webView =
+        new InputAwareWebViewPlatformView(mockContext, null);
+
+    final WebViewClientImpl mockWebViewClient = mock(WebViewClientImpl.class);
+    final WebChromeClientImpl mockWebChromeClient = mock(WebChromeClientImpl.class);
+    final DownloadListenerImpl mockDownloadListener = mock(DownloadListenerImpl.class);
+    final JavaScriptChannel mockJavaScriptChannel = mock(JavaScriptChannel.class);
+
+    webView.setWebViewClient(mockWebViewClient);
+    webView.setWebChromeClient(mockWebChromeClient);
+    webView.setDownloadListener(mockDownloadListener);
+    webView.addJavascriptInterface(mockJavaScriptChannel, "jchannel");
+
+    webView.release();
+
+    verify(mockWebViewClient).release();
+    verify(mockWebChromeClient).release();
+    verify(mockDownloadListener).release();
+    verify(mockJavaScriptChannel).release();
+  }
+
+  @Test
+  public void releaseInputAwareWebViewDependents() {
+    final InputAwareWebViewPlatformView webView =
+        new InputAwareWebViewPlatformView(mockContext, null);
+
+    final WebViewClientImpl mockWebViewClient = mock(WebViewClientImpl.class);
+    final WebChromeClientImpl mockWebChromeClient = mock(WebChromeClientImpl.class);
+    final DownloadListenerImpl mockDownloadListener = mock(DownloadListenerImpl.class);
+    final JavaScriptChannel mockJavaScriptChannel = mock(JavaScriptChannel.class);
+    final JavaScriptChannel mockJavaScriptChannel2 = mock(JavaScriptChannel.class);
+
+    webView.setWebViewClient(mockWebViewClient);
+    webView.setWebChromeClient(mockWebChromeClient);
+    webView.setDownloadListener(mockDownloadListener);
+    webView.addJavascriptInterface(mockJavaScriptChannel, "jchannel");
+
+    // Release should be called on the object added above.
+    webView.addJavascriptInterface(mockJavaScriptChannel2, "jchannel");
+    verify(mockJavaScriptChannel).release();
+
+    webView.setWebViewClient(null);
+    webView.setWebChromeClient(null);
+    webView.setDownloadListener(null);
+    webView.removeJavascriptInterface("jchannel");
+
+    verify(mockWebViewClient).release();
+    verify(mockWebChromeClient).release();
+    verify(mockDownloadListener).release();
+    verify(mockJavaScriptChannel2).release();
   }
 
   @Test
@@ -78,7 +166,8 @@ public class WebViewTest {
 
   @Test
   public void loadDataWithNullValues() {
-    testHostApiImpl.loadData(0L, "VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==", null, null);
+    testHostApiImpl.loadData(
+        0L, "VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==", "<null-value>", "<null-value>");
     verify(mockWebView).loadData("VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==", null, null);
   }
 
@@ -103,7 +192,12 @@ public class WebViewTest {
   @Test
   public void loadDataWithBaseUrlAndNullValues() {
     testHostApiImpl.loadDataWithBaseUrl(
-        0L, null, "VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==", null, null, null);
+        0L,
+        "<null-value>",
+        "VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==",
+        "<null-value>",
+        "<null-value>",
+        "<null-value>");
     verify(mockWebView)
         .loadDataWithBaseURL(null, "VGhpcyBkYXRhIGlzIGJhc2U2NCBlbmNvZGVkLg==", null, null, null);
   }
@@ -175,7 +269,7 @@ public class WebViewTest {
           }
 
           @Override
-          public void error(@NonNull Throwable error) {}
+          public void error(Throwable error) {}
         });
 
     @SuppressWarnings("unchecked")
@@ -218,18 +312,9 @@ public class WebViewTest {
   }
 
   @Test
-  public void getScrollPosition() {
-    when(mockWebView.getScrollX()).thenReturn(1);
-    when(mockWebView.getScrollY()).thenReturn(2);
-    final GeneratedAndroidWebView.WebViewPoint position = testHostApiImpl.getScrollPosition(0L);
-    assertEquals((long) position.getX(), 1L);
-    assertEquals((long) position.getY(), 2L);
-  }
-
-  @Test
   public void setWebViewClient() {
     final WebViewClient mockWebViewClient = mock(WebViewClient.class);
-    testInstanceManager.addDartCreatedInstance(mockWebViewClient, 1L);
+    testInstanceManager.addInstance(mockWebViewClient, 1L);
 
     testHostApiImpl.setWebViewClient(0L, 1L);
     verify(mockWebView).setWebViewClient(mockWebViewClient);
@@ -239,7 +324,7 @@ public class WebViewTest {
   public void addJavaScriptChannel() {
     final JavaScriptChannel javaScriptChannel =
         new JavaScriptChannel(mock(JavaScriptChannelFlutterApiImpl.class), "aName", null);
-    testInstanceManager.addDartCreatedInstance(javaScriptChannel, 1L);
+    testInstanceManager.addInstance(javaScriptChannel, 1L);
 
     testHostApiImpl.addJavaScriptChannel(0L, 1L);
     verify(mockWebView).addJavascriptInterface(javaScriptChannel, "aName");
@@ -249,7 +334,7 @@ public class WebViewTest {
   public void removeJavaScriptChannel() {
     final JavaScriptChannel javaScriptChannel =
         new JavaScriptChannel(mock(JavaScriptChannelFlutterApiImpl.class), "aName", null);
-    testInstanceManager.addDartCreatedInstance(javaScriptChannel, 1L);
+    testInstanceManager.addInstance(javaScriptChannel, 1L);
 
     testHostApiImpl.removeJavaScriptChannel(0L, 1L);
     verify(mockWebView).removeJavascriptInterface("aName");
@@ -258,7 +343,7 @@ public class WebViewTest {
   @Test
   public void setDownloadListener() {
     final DownloadListener mockDownloadListener = mock(DownloadListener.class);
-    testInstanceManager.addDartCreatedInstance(mockDownloadListener, 1L);
+    testInstanceManager.addInstance(mockDownloadListener, 1L);
 
     testHostApiImpl.setDownloadListener(0L, 1L);
     verify(mockWebView).setDownloadListener(mockDownloadListener);
@@ -267,116 +352,9 @@ public class WebViewTest {
   @Test
   public void setWebChromeClient() {
     final WebChromeClient mockWebChromeClient = mock(WebChromeClient.class);
-    testInstanceManager.addDartCreatedInstance(mockWebChromeClient, 1L);
+    testInstanceManager.addInstance(mockWebChromeClient, 1L);
 
     testHostApiImpl.setWebChromeClient(0L, 1L);
     verify(mockWebView).setWebChromeClient(mockWebChromeClient);
-  }
-
-  @Test
-  public void defaultWebChromeClientIsSecureWebChromeClient() {
-    final WebViewPlatformView webView = new WebViewPlatformView(mockContext, null, null);
-    assertTrue(
-        webView.getWebChromeClient() instanceof WebChromeClientHostApiImpl.SecureWebChromeClient);
-    assertFalse(
-        webView.getWebChromeClient() instanceof WebChromeClientHostApiImpl.WebChromeClientImpl);
-  }
-
-  @Test
-  public void defaultWebChromeClientDoesNotAttemptToCommunicateWithDart() {
-    final WebViewPlatformView webView = new WebViewPlatformView(mockContext, null, null);
-    // This shouldn't throw an Exception.
-    Objects.requireNonNull(webView.getWebChromeClient()).onProgressChanged(webView, 0);
-  }
-
-  @Test
-  public void disposeDoesNotCallDestroy() {
-    final boolean[] destroyCalled = {false};
-    final WebViewPlatformView webView =
-        new WebViewPlatformView(mockContext, null, null) {
-          @Override
-          public void destroy() {
-            destroyCalled[0] = true;
-          }
-        };
-    webView.dispose();
-
-    assertFalse(destroyCalled[0]);
-  }
-
-  @Test
-  public void destroyWebViewWhenDisposedFromJavaObjectHostApi() {
-    final boolean[] destroyCalled = {false};
-    final WebViewPlatformView webView =
-        new WebViewPlatformView(mockContext, null, null) {
-          @Override
-          public void destroy() {
-            destroyCalled[0] = true;
-          }
-        };
-
-    testInstanceManager.addDartCreatedInstance(webView, 1);
-    final JavaObjectHostApiImpl javaObjectHostApi = new JavaObjectHostApiImpl(testInstanceManager);
-    javaObjectHostApi.dispose(1L);
-
-    assertTrue(destroyCalled[0]);
-  }
-
-  @Test
-  public void flutterApiCreate() {
-    final InstanceManager instanceManager = InstanceManager.create(identifier -> {});
-
-    final WebViewFlutterApiImpl flutterApiImpl =
-        new WebViewFlutterApiImpl(mockBinaryMessenger, instanceManager);
-
-    final WebViewFlutterApi mockFlutterApi = mock(WebViewFlutterApi.class);
-    flutterApiImpl.setApi(mockFlutterApi);
-
-    flutterApiImpl.create(mockWebView, reply -> {});
-
-    final long instanceIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(mockWebView));
-    verify(mockFlutterApi).create(eq(instanceIdentifier), any());
-
-    instanceManager.stopFinalizationListener();
-  }
-
-  @Test
-  public void setImportantForAutofillForParentFlutterView() {
-    final WebViewPlatformView webView =
-        new WebViewPlatformView(
-            mockContext,
-            mockBinaryMessenger,
-            testInstanceManager,
-            (int version) -> version <= Build.VERSION_CODES.O);
-
-    final WebViewPlatformView webViewSpy = spy(webView);
-    final FlutterView mockFlutterView = mock(FlutterView.class);
-    when(webViewSpy.getParent()).thenReturn(mockFlutterView);
-
-    webViewSpy.onAttachedToWindow();
-
-    verify(mockFlutterView).setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
-  }
-
-  @Test
-  public void onScrollChanged() {
-    final InstanceManager instanceManager = InstanceManager.create(identifier -> {});
-
-    final WebViewFlutterApiImpl flutterApiImpl =
-        new WebViewFlutterApiImpl(mockBinaryMessenger, instanceManager);
-
-    final WebViewFlutterApi mockFlutterApi = mock(WebViewFlutterApi.class);
-    flutterApiImpl.setApi(mockFlutterApi);
-    flutterApiImpl.create(mockWebView, reply -> {});
-
-    flutterApiImpl.onScrollChanged(mockWebView, 0L, 1L, 2L, 3L, reply -> {});
-
-    final long instanceIdentifier =
-        Objects.requireNonNull(instanceManager.getIdentifierForStrongReference(mockWebView));
-    verify(mockFlutterApi)
-        .onScrollChanged(eq(instanceIdentifier), eq(0L), eq(1L), eq(2L), eq(3L), any());
-
-    instanceManager.stopFinalizationListener();
   }
 }

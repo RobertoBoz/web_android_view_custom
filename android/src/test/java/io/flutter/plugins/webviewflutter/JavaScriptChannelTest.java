@@ -6,12 +6,12 @@ package io.flutter.plugins.webviewflutter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 import android.os.Handler;
-import android.os.Looper;
 import io.flutter.plugins.webviewflutter.JavaScriptChannelHostApiImpl.JavaScriptChannelCreator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class JavaScriptChannelTest {
 
   @Before
   public void setUp() {
-    instanceManager = InstanceManager.create(identifier -> {});
+    instanceManager = new InstanceManager();
 
     final JavaScriptChannelCreator javaScriptChannelCreator =
         new JavaScriptChannelCreator() {
@@ -48,21 +48,18 @@ public class JavaScriptChannelTest {
 
     hostApiImpl =
         new JavaScriptChannelHostApiImpl(
-            instanceManager,
-            javaScriptChannelCreator,
-            mockFlutterApi,
-            new Handler(Looper.myLooper()));
+            instanceManager, javaScriptChannelCreator, mockFlutterApi, new Handler());
     hostApiImpl.create(0L, "aChannelName");
-  }
-
-  @After
-  public void tearDown() {
-    instanceManager.stopFinalizationListener();
   }
 
   @Test
   public void postMessage() {
     javaScriptChannel.postMessage("A message post.");
     verify(mockFlutterApi).postMessage(eq(javaScriptChannel), eq("A message post."), any());
+
+    reset(mockFlutterApi);
+    javaScriptChannel.release();
+    javaScriptChannel.postMessage("a message");
+    verify(mockFlutterApi, never()).postMessage((JavaScriptChannel) any(), any(), any());
   }
 }
